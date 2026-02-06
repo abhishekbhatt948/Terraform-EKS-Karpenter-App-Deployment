@@ -2,12 +2,23 @@ name: Terraform Destroy
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DESTROY to confirm"
+        required: true
 
 jobs:
   destroy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate confirmation
+        run: |
+            if [ "${{ github.event.inputs.confirm }}" != "DESTROY" ]; then
+              echo "Destroy aborted"
+              exit 1
+            fi
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
