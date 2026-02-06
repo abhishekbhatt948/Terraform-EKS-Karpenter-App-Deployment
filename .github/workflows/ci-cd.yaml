@@ -45,7 +45,7 @@ jobs:
         working-directory: terraform
         run: |
           echo "ecr_repo=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
-          echo "eks_cluster=$(terraform output -raw eks_cluster_name)" >> $GITHUB_OUTPUT
+          echo "eks_cluster=$(terraform output -raw cluster_name)" >> $GITHUB_OUTPUT
 
 # -------------------------------------------------
 # JOB 2: Docker Build & Push
@@ -70,7 +70,7 @@ jobs:
           ECR_REPO: ${{ needs.terraform.outputs.ecr_repo }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REPO:$IMAGE_TAG ./app
+          docker build -t $ECR_REPO:$IMAGE_TAG .
           docker push $ECR_REPO:$IMAGE_TAG
 
 # -------------------------------------------------

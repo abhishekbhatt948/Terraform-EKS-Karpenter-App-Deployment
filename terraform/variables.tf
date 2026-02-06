@@ -16,6 +16,7 @@ variable "cluster_name" {
 variable "ecr_repository_name" {
   type        = string
   description = "ECR repository name"
+  default = "app"
 }
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
