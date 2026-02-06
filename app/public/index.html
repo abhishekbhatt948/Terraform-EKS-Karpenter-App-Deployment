@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Application</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Hi, My name is Abhishek Bhatt</h2>
+
+  <p>
+    Here you can see my demo application.  
+    This demo application creates logs which are stored in EFK,  
+    so you can view them in the Kibana dashboard.
+  </p>
+
+  <button onclick="generateLog()">Generate Logs</button>
+
+  <p id="result"></p>
+
+  <script>
+    function generateLog() {
+      fetch("/generate-log", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("result").innerText = data.status;
+        })
+        .catch(() => {
+          document.getElementById("result").innerText = "Error generating log";
+        });
+    }
+  </script>
+
+</body>
+</html>

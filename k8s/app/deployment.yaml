@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-nodejs-app
+  namespace: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-nodejs
+  template:
+    metadata:
+      labels:
+        app: demo-nodejs
+    spec:
+      containers:
+      - name: demo-nodejs-app
+        image: IMAGE_PLACEHOLDER
+        imagePullPolicy: "Always"
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 20
