@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      ecr_repo: ${{ steps.tf.outputs.ecr_repo }}
+      ecr_repo: ${{ steps.tf.outputs.ecr_repository_url }}
       eks_cluster: ${{ steps.tf.outputs.eks_cluster }}
 
     steps:
@@ -44,7 +44,7 @@ jobs:
         id: tf
         working-directory: terraform
         run: |
-          echo "ecr_repo=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
+          echo "ecr_repo=$(terraform output -raw ecr_repo)" >> $GITHUB_OUTPUT
           echo "eks_cluster=$(terraform output -raw cluster_name)" >> $GITHUB_OUTPUT
 
 # -------------------------------------------------
