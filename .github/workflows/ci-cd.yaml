@@ -97,6 +97,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
-          sed -i "s|IMAGE_PLACEHOLDER|$ECR_URI:$IMAGE_TAG|g" k8s/deployment.yaml
+          sed -i "s|IMAGE_PLACEHOLDER|$ECR_URI:$IMAGE_TAG|g" k8s/app/deployment.yaml
           kubectl apply -f k8s/app
           kubectl apply -f k8s/hpa
