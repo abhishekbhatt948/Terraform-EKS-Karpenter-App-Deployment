@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      ecr_repo: ${{ steps.tf.outputs.ecr_repository_url }}
+      ecr_repository_url: ${{ steps.tf.outputs.ecr_repository_url }}
       eks_cluster: ${{ steps.tf.outputs.eks_cluster }}
 
     steps:
@@ -44,7 +44,7 @@ jobs:
         id: tf
         working-directory: terraform
         run: |
-          echo "ecr_repo=$(terraform output -raw ecr_repo)" >> $GITHUB_OUTPUT
+          echo "ecr_repository_url=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
           echo "eks_cluster=$(terraform output -raw cluster_name)" >> $GITHUB_OUTPUT
 
 # -------------------------------------------------
@@ -67,11 +67,11 @@ jobs:
 
       - name: Build & Push Image
         env:
-          ECR_REPO: ${{ needs.terraform.outputs.ecr_repo }}
+          ecr_repository_url: ${{ needs.terraform.outputs.ecr_repository_url }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REPO:$IMAGE_TAG .
-          docker push $ECR_REPO:$IMAGE_TAG
+          docker build -t $ecr_repository_url:$IMAGE_TAG .
+          docker push $ecr_repository_url:$IMAGE_TAG
 
 # -------------------------------------------------
 # JOB 3: Deploy to EKS
@@ -97,7 +97,7 @@ jobs:
 
       - name: Deploy to EKS
         env:
-          IMAGE: ${{ needs.terraform.outputs.ecr_repo }}:${{ github.sha }}
+          IMAGE: ${{ needs.terraform.outputs.ecr_repository_url }}:${{ github.sha }}
         run: |
           sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/app/deployment.yaml
           kubectl apply -f k8s/app/
