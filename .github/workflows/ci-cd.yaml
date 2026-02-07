@@ -9,28 +9,30 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
+# -------------------------------------------------
+# JOB 1: Terraform (Infra)
+# -------------------------------------------------
 jobs:
-
-# -------------------------------------------------
-# JOB 1: Terraform
-# -------------------------------------------------
   terraform:
     runs-on: ubuntu-latest
 
     outputs:
-      ecr_repository_url: ${{ steps.tf.outputs.ecr_repository_url }}
-      eks_cluster: ${{ steps.tf.outputs.eks_cluster }}
+      ECR_REPOSITORY_URL: ${{ steps.export.outputs.ECR_REPOSITORY_URL }}
+      CLUSTER_NAME:       ${{ steps.export.outputs.CLUSTER_NAME }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ env.AWS_REGION }}
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         working-directory: terraform
@@ -40,12 +42,13 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Read Terraform Outputs
-        id: tf
+      # 🔑 EXPORT TERRAFORM OUTPUTS
+      - name: Export Terraform Outputs
+        id: export
         working-directory: terraform
         run: |
-          echo "ecr_repository_url=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
-          echo "eks_cluster=$(terraform output -raw cluster_name)" >> $GITHUB_OUTPUT
+          echo "ECR_REPOSITORY_URL=$(terraform output -raw ecr_repository_url)" >> $GITHUB_OUTPUT
+          echo "CLUSTER_NAME=$(terraform output -raw cluster_name)" >> $GITHUB_OUTPUT
 
 # -------------------------------------------------
 # JOB 2: Docker Build & Push
@@ -55,19 +58,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ env.AWS_REGION }}
 
-      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build & Push Image
+      - name: Build & Push Docker Image
         env:
-          ECR_REPOSITORY_URL: ${{ needs.terraform.outputs.ecr_repository_url }}
+          ECR_REPOSITORY_URL: ${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "Using ECR repo: $ECR_REPOSITORY_URL"
@@ -82,9 +88,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -94,11 +102,11 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region $AWS_REGION \
-            --name ${{ needs.terraform.outputs.eks_cluster }}
+            --name ${{ needs.terraform.outputs.CLUSTER_NAME }}
 
-      - name: Deploy to EKS
+      - name: Deploy Application
         env:
-          IMAGE: ${{ needs.terraform.outputs.ecr_repository_url }}:${{ github.sha }}
+          IMAGE: ${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}:${{ github.sha }}
         run: |
           sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/app/deployment.yaml
           kubectl apply -f k8s/app/
