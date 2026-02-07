@@ -33,6 +33,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: terraform
@@ -76,7 +78,7 @@ jobs:
 
       - uses: aws-actions/amazon-ecr-login@v2
 
-      - name: DEBUG – Job outputs
+      - name: DEBUG - Job outputs
         run: |
           echo "JOB ECR='${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}'"
 
