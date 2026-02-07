@@ -67,7 +67,7 @@ jobs:
         run: |
           ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
           echo "Using ECR: $ECR_URI"
-          docker build -t $ECR_URI:$IMAGE_TAG ./app
+          docker build -t $ECR_URI:$IMAGE_TAG .
           docker push $ECR_URI:$IMAGE_TAG
 
 # -------------------------------------------------
