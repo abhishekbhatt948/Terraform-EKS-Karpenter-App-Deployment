@@ -11,7 +11,7 @@ variable "project_name" {
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "eks-demo-dev"
+  default     = "eks-demo"
 }
 variable "ecr_repository_name" {
   type        = string
