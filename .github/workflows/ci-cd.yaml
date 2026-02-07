@@ -11,7 +11,7 @@ env:
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
   # FIXED, KNOWN VALUES
-  ECR_REPOSITORY: demo-nodejs-app
+  ECR_REPOSITORY: app
   EKS_CLUSTER_NAME: eks-demo
 
 jobs:
