@@ -1,4 +1,4 @@
-name: CI-CD-EKS-Karpenter-Demo
+name: CI-CD-EKS-Demo
 
 on:
   push:
@@ -7,32 +7,31 @@ on:
       - master
 
 env:
-  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_REGION: ap-south-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+  # FIXED, KNOWN VALUES
+  ECR_REPOSITORY: demo-nodejs-app
+  EKS_CLUSTER_NAME: eks-demo
+
+jobs:
 
 # -------------------------------------------------
 # JOB 1: Terraform (Infra)
 # -------------------------------------------------
-jobs:
   terraform:
     runs-on: ubuntu-latest
 
-    outputs:
-      ECR_REPOSITORY_URL: ${{ steps.export.outputs.ECR_REPOSITORY_URL }}
-      CLUSTER_NAME: ${{ steps.export.outputs.CLUSTER_NAME }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:            ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
 
@@ -44,24 +43,8 @@ jobs:
         working-directory: terraform
         run: terraform apply -auto-approve
 
-      - name: Export Terraform Outputs
-        id: export
-        working-directory: terraform
-        shell: bash
-        run: |
-          set -e
-          terraform output
-          echo "ECR_REPOSITORY_URL=$(terraform output -raw ecr_repository_url)" >> "$GITHUB_OUTPUT"
-          echo "CLUSTER_NAME=$(terraform output -raw cluster_name)" >> "$GITHUB_OUTPUT"
-
-      - name: DEBUG - Show exported outputs
-        run: |
-          echo "STEP ECR='${{ steps.export.outputs.ECR_REPOSITORY_URL }}'"
-          echo "STEP CLUSTER='${{ steps.export.outputs.CLUSTER_NAME }}'"
-
-
 # -------------------------------------------------
-# JOB 2: Docker Build & Push
+# JOB 2: Build & Push Image
 # -------------------------------------------------
   build-and-push:
     needs: terraform
@@ -78,20 +61,14 @@ jobs:
 
       - uses: aws-actions/amazon-ecr-login@v2
 
-      - name: DEBUG - Job outputs
-        run: |
-          echo "JOB ECR='${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}'"
-
-      - name: Build & Push Image
+      - name: Build & Push Docker Image
         env:
-          ECR_REPOSITORY_URL: ${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          set -e
-          echo "Using ECR repo: $ECR_REPOSITORY_URL"
-          docker build -t "$ECR_REPOSITORY_URL:$IMAGE_TAG" .
-          docker push "$ECR_REPOSITORY_URL:$IMAGE_TAG"
-
+          ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
+          echo "Using ECR: $ECR_URI"
+          docker build -t $ECR_URI:$IMAGE_TAG ./app
+          docker push $ECR_URI:$IMAGE_TAG
 
 # -------------------------------------------------
 # JOB 3: Deploy to EKS
@@ -101,11 +78,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -115,12 +90,13 @@ jobs:
         run: |
           aws eks update-kubeconfig \
             --region $AWS_REGION \
-            --name ${{ needs.terraform.outputs.CLUSTER_NAME }}
+            --name $EKS_CLUSTER_NAME
 
       - name: Deploy Application
         env:
-          IMAGE: ${{ needs.terraform.outputs.ECR_REPOSITORY_URL }}:${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" k8s/app/deployment.yaml
-          kubectl apply -f k8s/app/
-          kubectl apply -f k8s/hpa/
+          ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
+          sed -i "s|IMAGE_PLACEHOLDER|$ECR_URI:$IMAGE_TAG|g" k8s/deployment.yaml
+          kubectl apply -f k8s/app
+          kubectl apply -f k8s/hpa
