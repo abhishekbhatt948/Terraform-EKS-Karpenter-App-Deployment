@@ -67,11 +67,12 @@ jobs:
 
       - name: Build & Push Image
         env:
-          ecr_repository_url: ${{ needs.terraform.outputs.ecr_repository_url }}
+          ECR_REPOSITORY_URL: ${{ needs.terraform.outputs.ecr_repository_url }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ecr_repository_url:$IMAGE_TAG .
-          docker push $ecr_repository_url:$IMAGE_TAG
+          echo "Using ECR repo: $ECR_REPOSITORY_URL"
+          docker build -t $ECR_REPOSITORY_URL:$IMAGE_TAG .
+          docker push $ECR_REPOSITORY_URL:$IMAGE_TAG
 
 # -------------------------------------------------
 # JOB 3: Deploy to EKS
