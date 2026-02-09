@@ -78,45 +78,45 @@ The solution follows a GitOps-style workflow:
 - Kubernetes metrics used for autoscaling
 
 # Technology Stack:-
--- Cloud Services
+- Cloud Services
 
-Amazon VPC
+    - Amazon VPC
 
-Amazon EKS
+    - Amazon EKS
 
-Amazon ECR
+    - Amazon ECR
 
-Amazon S3
+    - Amazon S3
 
-Amazon DynamoDB - optional
+    - Amazon DynamoDB - optional
 
-AWS IAM
+    - AWS IAM
 
--- DevOps & IaC Tools
+- DevOps & IaC Tools
 
-Terraform
+    - Terraform
 
-Docker
+    - Docker
 
-Kubernetes
+    - Kubernetes
 
-Karpenter
+    - Karpenter
 
-Helm (for add-ons)
+    - Helm (for add-ons)
 
-CI/CD Tools
+    - CI/CD Tools
 
-GitHub Actions
+    - GitHub Actions
 
--- Monitoring & Logging
+- Monitoring & Logging
 
-Fluent Bit
+    - Fluent Bit
 
-Elasticsearch
+    - Elasticsearch
 
-Kibana
+    - Kibana
 
-Kubernetes Metrics Server 
+    - Kubernetes Metrics Server 
 
 # Key Design Decisions
 - Terraform with Remote Backend
@@ -156,128 +156,128 @@ Kubernetes Metrics Server
 
 - Local Tools
 
-Terraform ≥ 1.x
+- Terraform ≥ 1.x
 
-Docker
+- Docker
 
-AWS CLI ≥ v2
+- AWS CLI ≥ v2
 
-kubectl
+- kubectl
 
 # GitHub Secrets (Required)
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-AWS_ACCOUNT_ID
-AWS_REGION
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_ACCOUNT_ID
+- AWS_REGION
 
 # How to Run / Deploy (Step-by-Step)
 1. Clone the Repository
-git clone https://github.com/abhishekbhatt948/Terraform-EKS-Karpenter-App-Deployment.git
-cd Terraform-EKS-Karpenter-App-Deployment
+    - git clone https://github.com/abhishekbhatt948/Terraform-EKS-Karpenter-App-Deployment.git
+    - cd Terraform-EKS-Karpenter-App-Deployment
 
 2. Configure GitHub Secrets
 
-Add all required AWS secrets in GitHub → Repository → Settings → Secrets and variables → Actions.
+    - Add all required AWS secrets in GitHub → Repository → Settings → Secrets and variables → Actions.
 
 3. Initialize Terraform Backend first (One-Time)
 
-Run the terraform-backend GitHub Actions workflow to create:
+    - Run the terraform-backend GitHub Actions workflow to create:
 
-S3 bucket for Terraform state
+    - S3 bucket for Terraform state
 
-DynamoDB table for state locking
+    - DynamoDB table for state locking
 
-This step is mandatory before running the main pipeline.
+    This step is mandatory before running the main pipeline.
 
 4. Trigger CI/CD Pipeline
 
-Push code to the repository:
+    - Push code to the repository:
 
-git push origin main
+    - git push origin main
 
 
-# Pipeline actions:
+    # Pipeline actions:
 
-- Provision infrastructure
+    - Provision infrastructure
 
-- Build Docker image
+    - Build Docker image
 
-- Push image to ECR
+    - Push image to ECR
 
-- Deploy application to EKS
+    - Deploy application to EKS
 
 5. Access the Cluster (Optional)
-aws eks update-kubeconfig --name eks-demo --region ap-south-1
+    - aws eks update-kubeconfig --name eks-demo --region ap-south-1
 
 6. Access Application and Kibana
-kubectl port-forward svc/demo-nodejs-app 8080:80 -n app
-kubectl port-forward svc/kibana 5601:5601 -n logging
+    - kubectl port-forward svc/demo-nodejs-app 8080:80 -n app
+    - kubectl port-forward svc/kibana 5601:5601 -n logging
 
 # CI/CD Pipeline Flow
 
 - Source
 
-Git push triggers GitHub Actions
+    Git push triggers GitHub Actions
 
 - Build
 
-Docker image built from app/
+    Docker image built from app/
 
-Tagged with commit SHA
+    Tagged with commit SHA
 
 - Security
 
-IAM access via GitHub secrets
+    IAM access via GitHub secrets
 
-No credentials stored in code
+    No credentials stored in code
 
 - Deploy
 
-Terraform applies infrastructure
+    Terraform applies infrastructure
 
-Kubernetes manifests applied via kubectl
+    Kubernetes manifests applied via kubectl
 
-Security Considerations
+    Security Considerations
 
-Private VPC and private worker nodes
+    Private VPC and private worker nodes
 
-IAM roles with minimal permissions
+    IAM roles with minimal permissions
 
-OIDC-based authentication for Kubernetes
+    OIDC-based authentication for Kubernetes
 
-No secrets committed to source control
+    No secrets committed to source control
 
-Manual destroy workflow to prevent accidental deletion
+    Manual destroy workflow to prevent accidental deletion
 
-Scalability & High Availability
+    Scalability & High Availability
 
-Horizontal Pod Autoscaler scales pods
+    Horizontal Pod Autoscaler scales pods
 
-Karpenter scales nodes dynamically
+    Karpenter scales nodes dynamically
 
-Multi-AZ EKS deployment
+    Multi-AZ EKS deployment
 
-Stateless application design
+    Stateless application design
 
-Monitoring & Logging
+    Monitoring & Logging
 
-Centralized log aggregation via EFK
+    Centralized log aggregation via EFK
 
-Pod-level and node-level visibility
+    Pod-level and node-level visibility
 
-Kubernetes metrics for autoscaling decisions
+    Kubernetes metrics for autoscaling decisions
 
 - Cleanup / Teardown
 
-Infrastructure destruction is manual by design.
+    Infrastructure destruction is manual by design.
 
-Steps:
+    - Steps:
 
-Trigger terraform-destroy GitHub Actions workflow
+    Trigger terraform-destroy GitHub Actions workflow
 
-Explicit approval required
+    Explicit approval required
 
-All AWS resources are safely removed
+    All AWS resources are safely removed
 
 # Assumptions & Limitations:
 
