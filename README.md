@@ -1,6 +1,6 @@
-# CI/CD Automation for EKS using Terraform, GitHub Actions & Karpenter
+<!-- # CI/CD Automation for EKS using Terraform, GitHub Actions & Karpenter
 
-This repository demonstrates a fully automated CI/CD pipeline for deploying a containerized Node.js application to Amazon EKS, using Terraform for infrastructure provisioning and GitHub Actions for continuous delivery.
+This repository demonstrates a fully automated CI/CD pipeline for deploying a containerized Node.js application to Amazon EKS, using Terraform for infrastructure provisioning and GitHub Actions for continuous delivery. -->
 
 # Assignment :
 - Create Private VPC,
