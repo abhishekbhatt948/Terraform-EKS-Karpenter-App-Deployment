@@ -22,8 +22,10 @@ module "aws_auth" {
   source        = "./modules/aws-auth"
   node_role_arn = module.nodegroup.node_role_arn
 
-  providers = {
+    providers = {
     kubernetes = kubernetes
+    helm       = helm
+    kubectl   = kubectl
   }
 
   depends_on = [module.nodegroup]
@@ -53,9 +55,10 @@ module "ecr" {
 module "efk" {
   source = "./modules/efk"
 
-  providers = {
-    helm       = helm
+    providers = {
     kubernetes = kubernetes
+    helm       = helm
+    kubectl   = kubectl
   }
 
   depends_on = [module.eks]

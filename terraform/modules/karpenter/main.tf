@@ -1,19 +1,16 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
+    kubernetes = {
+      source = "hashicorp/kubernetes"
     }
-
     helm = {
-      source  = "hashicorp/helm"
+      source = "hashicorp/helm"
     }
-
     kubectl = {
-      source  = "gavinbunney/kubectl"
+      source = "gavinbunney/kubectl"
     }
   }
 }
-
 resource "kubectl_manifest" "nodeclass" {
   yaml_body = <<YAML
 apiVersion: karpenter.k8s.aws/v1beta1

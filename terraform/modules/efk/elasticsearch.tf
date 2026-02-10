@@ -11,6 +11,7 @@ terraform {
   }
 }
 
+
 resource "helm_release" "elasticsearch" {
   name       = "elasticsearch"
   namespace  = var.namespace
