@@ -33,39 +33,51 @@ resource "aws_iam_policy" "karpenter_controller" {
       {
         Effect = "Allow"
         Action = [
-          # REQUIRED — cluster networking detection
-          "eks:DescribeCluster",
+            # EKS
+            "eks:DescribeCluster",
 
-          # EC2 discovery & provisioning
-          "ec2:DescribeInstances",
-          "ec2:DescribeInstanceTypes",
-          "ec2:DescribeInstanceTypeOfferings",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeImages",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeSpotPriceHistory",
-          "ec2:RunInstances",
-          "ec2:TerminateInstances",
-          "ec2:CreateLaunchTemplate",
-          "ec2:DeleteLaunchTemplate",
-          "ec2:DescribeLaunchTemplates",
+            # EC2 discovery
+            "ec2:DescribeInstances",
+            "ec2:DescribeInstanceTypes",
+            "ec2:DescribeInstanceTypeOfferings",
+            "ec2:DescribeAvailabilityZones",
+            "ec2:DescribeImages",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeSpotPriceHistory",
 
-          # Pricing
-          "pricing:GetProducts",
+            # EC2 provisioning
+            "ec2:RunInstances",
+            "ec2:TerminateInstances",
 
-          # SSM (AMI discovery)
-          "ssm:GetParameter",
+            # Launch Template (CRITICAL)
+            "ec2:CreateLaunchTemplate",
+            "ec2:CreateLaunchTemplateVersion",
+            "ec2:DeleteLaunchTemplate",
+            "ec2:DeleteLaunchTemplateVersions",
+            "ec2:DescribeLaunchTemplates",
+            "ec2:DescribeLaunchTemplateVersions",
+            "ec2:ModifyLaunchTemplate",
 
-          # IAM (instance profile lifecycle)
-          "iam:GetInstanceProfile",
-          "iam:CreateInstanceProfile",
-          "iam:DeleteInstanceProfile",
-          "iam:AddRoleToInstanceProfile",
-          "iam:RemoveRoleFromInstanceProfile",
-          "iam:TagInstanceProfile",
-          "iam:PassRole"
-        ]
+            # Tagging (CRITICAL)
+            "ec2:TagResource",
+            "ec2:UntagResource",
+
+            # Pricing
+            "pricing:GetProducts",
+
+            # SSM
+            "ssm:GetParameter",
+
+            # IAM instance profile lifecycle
+            "iam:GetInstanceProfile",
+            "iam:CreateInstanceProfile",
+            "iam:DeleteInstanceProfile",
+            "iam:AddRoleToInstanceProfile",
+            "iam:RemoveRoleFromInstanceProfile",
+            "iam:TagInstanceProfile",
+            "iam:PassRole"
+          ]
         Resource = "*"
       }
     ]

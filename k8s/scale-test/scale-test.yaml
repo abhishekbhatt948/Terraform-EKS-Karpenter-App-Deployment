@@ -4,7 +4,7 @@ metadata:
   namespace: as
   name: scale-test
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
       app: scale-test
@@ -19,4 +19,4 @@ spec:
         resources:
           requests:
             cpu: "1000m"
-            memory: "1GI"
+            memory: "1Gi"
