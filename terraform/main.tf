@@ -22,6 +22,10 @@ module "aws_auth" {
   source        = "./modules/aws-auth"
   node_role_arn = module.nodegroup.node_role_arn
 
+  providers = {
+    kubernetes = kubernetes
+  }
+
   depends_on = [module.nodegroup]
 }
 
@@ -30,7 +34,13 @@ module "karpenter" {
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
   oidc_provider_arn = module.eks.oidc_provider_arn
-  aws_region = var.region
+  aws_region        = var.region
+
+  providers = {
+    helm    = helm
+    kubectl = kubectl
+    kubernetes = kubernetes
+  }
 
   depends_on = [module.aws_auth]
 }
@@ -42,4 +52,11 @@ module "ecr" {
 
 module "efk" {
   source = "./modules/efk"
+
+  providers = {
+    helm       = helm
+    kubernetes = kubernetes
+  }
+
+  depends_on = [module.eks]
 }
