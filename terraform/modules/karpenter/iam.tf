@@ -30,67 +30,10 @@ resource "aws_iam_policy" "karpenter_controller" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-
-      # =========================
-      # Core discovery + EC2 APIs
-      # =========================
       {
-        Effect = "Allow"
-        Action = [
-          # EKS
-          "eks:DescribeCluster",
-
-          # EC2 discovery
-          "ec2:DescribeInstances",
-          "ec2:DescribeInstanceTypes",
-          "ec2:DescribeInstanceTypeOfferings",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeImages",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeSpotPriceHistory",
-
-          # EC2 provisioning
-          "ec2:RunInstances",
-          "ec2:TerminateInstances",
-
-          # Launch Templates
-          "ec2:CreateLaunchTemplate",
-          "ec2:CreateLaunchTemplateVersion",
-          "ec2:DeleteLaunchTemplate",
-          "ec2:DeleteLaunchTemplateVersions",
-          "ec2:DescribeLaunchTemplates",
-          "ec2:DescribeLaunchTemplateVersions",
-          "ec2:ModifyLaunchTemplate",
-
-          # Tagging
-          "ec2:TagResource",
-          "ec2:UntagResource",
-
-          # Pricing
-          "pricing:GetProducts",
-
-          # SSM
-          "ssm:GetParameter",
-
-          # Instance profile lifecycle
-          "iam:GetInstanceProfile",
-          "iam:CreateInstanceProfile",
-          "iam:DeleteInstanceProfile",
-          "iam:AddRoleToInstanceProfile",
-          "iam:RemoveRoleFromInstanceProfile",
-          "iam:TagInstanceProfile"
-        ]
+        Effect   = "Allow"
+        Action   = "*"
         Resource = "*"
-      },
-
-      # =========================
-      # Pass ONLY the node role
-      # =========================
-      {
-        Effect = "Allow"
-        Action = "iam:PassRole"
-        Resource = "arn:aws:iam::047038669736:role/eks-demo-node-role"
       }
     ]
   })
