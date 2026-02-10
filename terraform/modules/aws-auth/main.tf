@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.25"
+    }
+  }
+}
+
 resource "kubernetes_config_map_v1_data" "aws_auth" {
   metadata {
     name      = "aws-auth"

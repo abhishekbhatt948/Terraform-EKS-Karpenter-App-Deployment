@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.13"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.25"
+    }
+  }
+}
+
 resource "helm_release" "fluent_bit" {
   name       = "fluent-bit"
   namespace  = "logging"
