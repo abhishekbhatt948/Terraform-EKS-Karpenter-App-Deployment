@@ -24,8 +24,6 @@ module "aws_auth" {
 
     providers = {
     kubernetes = kubernetes
-    helm       = helm
-    kubectl   = kubectl
   }
 
   depends_on = [module.nodegroup]
@@ -58,7 +56,6 @@ module "efk" {
     providers = {
     kubernetes = kubernetes
     helm       = helm
-    kubectl   = kubectl
   }
 
   depends_on = [module.eks]
