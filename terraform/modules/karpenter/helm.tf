@@ -16,18 +16,17 @@ resource "helm_release" "karpenter" {
   
   skip_crds = false
 
-  set {
-    name  = "settings.clusterName"
-    value = var.cluster_name
-  }
-
-  set {
-    name  = "settings.clusterEndpoint"
-    value = var.cluster_endpoint
-  }
-
-  set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = aws_iam_role.karpenter_controller.arn
-  }
+  values = [
+    yamlencode({
+      settings = {
+        clusterName     = var.cluster_name
+        clusterEndpoint = var.cluster_endpoint
+      }
+      serviceAccount = {
+        annotations = {
+          "eks.amazonaws.com/role-arn" = aws_iam_role.karpenter_controller.arn
+        }
+      }
+    })
+  ]
 }
