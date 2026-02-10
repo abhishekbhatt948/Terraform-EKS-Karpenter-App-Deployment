@@ -33,6 +33,7 @@ resource "aws_iam_policy" "karpenter_controller" {
       {
         Effect = "Allow"
         Action = [
+          # EC2
           "ec2:DescribeInstanceTypes",
           "ec2:DescribeInstances",
           "ec2:DescribeImages",
@@ -44,7 +45,16 @@ resource "aws_iam_policy" "karpenter_controller" {
           "ec2:CreateLaunchTemplate",
           "ec2:DeleteLaunchTemplate",
           "ec2:DescribeLaunchTemplates",
+
+          # Pricing
           "pricing:GetProducts",
+
+          # IAM – REQUIRED FOR KARPENTER
+          "iam:GetInstanceProfile",
+          "iam:CreateInstanceProfile",
+          "iam:DeleteInstanceProfile",
+          "iam:AddRoleToInstanceProfile",
+          "iam:RemoveRoleFromInstanceProfile",
           "iam:PassRole"
         ]
         Resource = "*"
