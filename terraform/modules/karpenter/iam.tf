@@ -33,7 +33,10 @@ resource "aws_iam_policy" "karpenter_controller" {
       {
         Effect = "Allow"
         Action = [
-          # EC2 – instance & capacity discovery
+          # REQUIRED — cluster networking detection
+          "eks:DescribeCluster",
+
+          # EC2 discovery & provisioning
           "ec2:DescribeInstances",
           "ec2:DescribeInstanceTypes",
           "ec2:DescribeInstanceTypeOfferings",
@@ -42,21 +45,19 @@ resource "aws_iam_policy" "karpenter_controller" {
           "ec2:DescribeSubnets",
           "ec2:DescribeSecurityGroups",
           "ec2:DescribeSpotPriceHistory",
-
-          # EC2 – provisioning
           "ec2:RunInstances",
           "ec2:TerminateInstances",
           "ec2:CreateLaunchTemplate",
           "ec2:DeleteLaunchTemplate",
           "ec2:DescribeLaunchTemplates",
 
-          # Pricing API
+          # Pricing
           "pricing:GetProducts",
 
-          # SSM – AMI discovery (CRITICAL)
+          # SSM (AMI discovery)
           "ssm:GetParameter",
 
-          # IAM – instance profile lifecycle (CRITICAL)
+          # IAM (instance profile lifecycle)
           "iam:GetInstanceProfile",
           "iam:CreateInstanceProfile",
           "iam:DeleteInstanceProfile",
