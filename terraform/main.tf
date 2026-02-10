@@ -54,8 +54,8 @@ module "efk" {
   source = "./modules/efk"
 
     providers = {
-    kubernetes = kubernetes
-    helm       = helm
+      helm       = helm
+      kubernetes = kubernetes
   }
 
   depends_on = [module.eks]
