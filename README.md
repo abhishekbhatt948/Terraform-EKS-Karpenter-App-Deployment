@@ -1,9 +1,9 @@
 # CI/CD Automation for Amazon EKS using Terraform, GitHub Actions & Karpenter
 # Project Overview
 
-This project demonstrates a production-oriented DevOps implementation for deploying a containerized microservice on Amazon EKS using Infrastructure as Code (IaC) and a fully automated CI/CD pipeline.
+<!-- This project demonstrates a production-oriented DevOps implementation for deploying a containerized microservice on Amazon EKS using Infrastructure as Code (IaC) and a fully automated CI/CD pipeline. -->
 
-The solution provisions a private, secure Kubernetes platform and deploys a sample Node.js microservice with dynamic autoscaling and centralized logging, following real-world enterprise DevOps practices.
+<!-- The solution provisions a private, secure Kubernetes platform and deploys a sample Node.js microservice with dynamic autoscaling and centralized logging, following real-world enterprise DevOps practices. -->
 
 # Business Purpose of the Solution
 
