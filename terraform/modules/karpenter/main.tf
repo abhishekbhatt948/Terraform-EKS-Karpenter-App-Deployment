@@ -50,12 +50,25 @@ spec:
         - key: kubernetes.io/arch
           operator: In
           values: ["amd64"]
+
         - key: kubernetes.io/os
           operator: In
           values: ["linux"]
+
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["t", "m", "c"]
+
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
+
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand", "spot"]
   limits:
     cpu: "1000"
-    memory: "16Gi"
+    memory: "1000Gi"
 YAML
 
   depends_on = [helm_release.karpenter]
