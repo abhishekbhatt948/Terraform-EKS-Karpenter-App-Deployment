@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: as
   name: scale-test
 spec:
   replicas: 3

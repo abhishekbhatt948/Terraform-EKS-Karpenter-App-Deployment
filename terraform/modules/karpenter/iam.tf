@@ -33,28 +33,36 @@ resource "aws_iam_policy" "karpenter_controller" {
       {
         Effect = "Allow"
         Action = [
-          # EC2
-          "ec2:DescribeInstanceTypes",
+          # EC2 – instance & capacity discovery
           "ec2:DescribeInstances",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeInstanceTypeOfferings",
+          "ec2:DescribeAvailabilityZones",
           "ec2:DescribeImages",
           "ec2:DescribeSubnets",
           "ec2:DescribeSecurityGroups",
-          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeSpotPriceHistory",
+
+          # EC2 – provisioning
           "ec2:RunInstances",
           "ec2:TerminateInstances",
           "ec2:CreateLaunchTemplate",
           "ec2:DeleteLaunchTemplate",
           "ec2:DescribeLaunchTemplates",
 
-          # Pricing
+          # Pricing API
           "pricing:GetProducts",
 
-          # IAM – REQUIRED FOR KARPENTER
+          # SSM – AMI discovery (CRITICAL)
+          "ssm:GetParameter",
+
+          # IAM – instance profile lifecycle (CRITICAL)
           "iam:GetInstanceProfile",
           "iam:CreateInstanceProfile",
           "iam:DeleteInstanceProfile",
           "iam:AddRoleToInstanceProfile",
           "iam:RemoveRoleFromInstanceProfile",
+          "iam:TagInstanceProfile",
           "iam:PassRole"
         ]
         Resource = "*"
@@ -62,7 +70,6 @@ resource "aws_iam_policy" "karpenter_controller" {
     ]
   })
 }
-
 
 resource "aws_iam_role_policy_attachment" "karpenter_attach" {
   role       = aws_iam_role.karpenter_controller.name
