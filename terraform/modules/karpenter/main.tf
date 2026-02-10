@@ -22,9 +22,9 @@ metadata:
   name: default
 spec:
   role: ${var.cluster_name}-node-role
-  amiFamily: AL2
-  amiSelectorTerms:
-    - alias: al2@latest
+  amiFamily: AL2023
+  # amiSelectorTerms:
+  #   - alias: al2@latest
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: ${var.cluster_name}
